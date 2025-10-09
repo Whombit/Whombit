@@ -16,7 +16,11 @@ public class FrameTest {
             frame.setSize(800, 600);
             frame.setLocationRelativeTo(null);
 
-            spritePanel panel = new spritePanel();
+            int width = frame.getWidth();  // Get the frame width
+            int height = frame.getHeight(); // Get the frame height
+
+            // Pass width and height to spritePanel constructor
+            spritePanel panel = new spritePanel(width, height);
             frame.add(panel);
             frame.setVisible(true);
         });
@@ -24,8 +28,11 @@ public class FrameTest {
 }
 
 class spritePanel extends JPanel {
-    private int x = frame.getHeight() / 2;
-    private int y = frame.getWidth() / 2;
+
+    private int width;
+    private int height;
+    private int x;
+    private int y;
     private float velocityX = 0;
     private float velocityY = 0;
     private final float ACCELERATION = 0.5f;
@@ -34,19 +41,26 @@ class spritePanel extends JPanel {
     private BufferedImage sprite;  // Declare sprite image
     private JLabel spriteLabel;  // Declare JLabel for sprite
 
-    public spritePanel() {
+    // Constructor that takes width and height
+    public spritePanel(int width, int height) {
+        this.width = width;
+        this.height = height;
+
         setFocusable(true);
         setBackground(Color.BLACK);
 
+        // Initialize sprite and spriteLabel
         try {
             sprite = ImageIO.read(new File("Whombit/Whombit/JFrameTest/dot.png"));
         } catch (IOException e) {
             System.out.println("Cannot read image file: " + e.getMessage());
-
         }
         
         spriteLabel = new JLabel(new ImageIcon(sprite));
         add(spriteLabel);
+        
+        this.x = width / 2 - sprite.getWidth() / 2;
+        this.y = height / 2 - sprite.getHeight() / 2;
         spriteLabel.setBounds(x, y, sprite.getWidth(), sprite.getHeight());
 
         addKeyListener(new KeyAdapter() {
@@ -71,6 +85,10 @@ class spritePanel extends JPanel {
                 x += velocityX;
                 y += velocityY;
 
+                // Ensure sprite stays within panel bounds
+                x = Math.max(0, Math.min(x, width - sprite.getWidth()));
+                y = Math.max(0, Math.min(y, height - sprite.getHeight()));
+
                 spriteLabel.setBounds(x, y, sprite.getWidth(), sprite.getHeight());
                 repaint();
             }
@@ -80,12 +98,6 @@ class spritePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Do aditioinal drawing here
-
-        // map
-        // hud
-        // etc.
-
+        // Additional drawing can go here (e.g., map, HUD, etc.)
     }
-
 }
